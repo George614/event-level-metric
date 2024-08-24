@@ -35,6 +35,8 @@ def overlap_ratio(l1, l2, u1, u2):
     :param u2: end of event 2
     :return: overlap ratio of two events
     """
+    if l2 > u1 or l1 > u2:
+        return 0.
     lowerbound = min(l1, l2)
     upperbound = max(u1, u2)
     overlapsrt = max(l1, l2)
@@ -80,8 +82,8 @@ def matching(events_r, events_t, winsize):
     offsets = np.zeros((N, 2))
     winsize_s = winsize[0]
     winsize_ns = winsize[1]
-    tranType_r = np.ones((N, 2), dtype=np.int) * -1
-    tranType_t = np.ones((N, 4), dtype=np.int) * -1
+    tranType_r = np.ones((N, 2), dtype=np.int32) * -1
+    tranType_t = np.ones((N, 4), dtype=np.int32) * -1
     tranType_r[:, 1] = events_r[:, 0]
 
     for i in range(N):
@@ -131,7 +133,7 @@ def matching(events_r, events_t, winsize):
     measures = np.concatenate(
         [events_r[:, 1:], matched, found, offsets, tranType_r, tranType_t], axis=1
     )
-    return np.asarray(measures, dtype=np.int)
+    return np.asarray(measures, dtype=np.int32)
 
 
 def offset_correction(measures, seq_r, seq_t):
@@ -145,7 +147,7 @@ def offset_correction(measures, seq_r, seq_t):
     N = len(seq_r)
     seq_r_done = np.copy(seq_r)
     seq_t_done = np.copy(seq_t)
-    shifted = np.zeros((N,), dtype=np.bool)
+    shifted = np.zeros((N,), dtype=np.bool_)
     for i in range(len(measures)):
         # make correction at start point
         start_idx = measures[i, 0]
@@ -290,7 +292,7 @@ def cal_conf_mat(seq_r, seq_t, num_cor):
     SF = sum(diff_events[:, 0] == 99)
     SP = sum(diff_events[:, 0] == 90)
     conf_mat = np.array(
-        [[num_cor[0], FP, FS], [PF, num_cor[1], PS], [SF, SP, num_cor[2]]], dtype=np.int
+        [[num_cor[0], FP, FS], [PF, num_cor[1], PS], [SF, SP, num_cor[2]]], dtype=np.int32
     )
     return conf_mat
 
